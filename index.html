@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style>
+        #menu {
+            padding: 10px;
+            padding-left: 0px;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        #width{
+            width:30px;
+        }
+    </style>
+    <script src="jquery-3.1.0.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            // 변수를 선언합니다.
+            var color = 'black';
+            var width = 1;
+            var isDown = false;
+            var newPoint, oldPoint;
+            // 소켓을 연결합니다.
+            var socket = io.connect();
+            // 입력 양식 이벤트를 연결합니다.
+            $('#pen').click(function () {
+                width = 1;
+                color = 'black';
+                $('#width').val(width);
+            });
+            $('#eraser').click(function () {
+                width = 10;
+                color = 'white';
+                $('#width').val(width);
+            });
+            $('#reload').click(function () {
+                location.reload();
+            });
+            $('#width').change(function () {
+                width = $(this).val()
+            });
+            $('#color').change(function () {
+                color = $(this).val()
+            });
+            // 소켓 이벤트를 연결합니다.
+            socket.on('line', function (data) {
+                context.beginPath();
+                context.lineWidth = data.width;
+                context.strokeStyle = data.color;
+                context.moveTo(data.x1, data.y1);
+                context.lineTo(data.x2, data.y2);
+                context.stroke();
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="menu">
+        <button id="pen">펜</button>
+        <button id="eraser">지우개</button>
+        <button id="reload">모두 지우기</button>
+        <input type="number" id="width" value="1" min="1" max="10">
+        <input type="color" id="color">
+    </div>  
+    <canvas id="canvas" width="800" height="400"></canvas>
+</body>
+</html>
